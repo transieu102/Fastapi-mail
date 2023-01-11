@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  service:
+    build:
+      context: ./
+      dockerfile: dockerfile
+    container_name: mapr_service
+    ports:
+      - 8000:80
+      - 587:587
+    restart: unless-stopped
+    volumes:
+      - ./:/base
+    env_file:
+      - ./.env
+

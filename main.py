@@ -2,7 +2,6 @@ from typing import List
 from fastapi import BackgroundTasks, FastAPI
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
-from starlette.responses import JSONResponse
 from typing import Union
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
