@@ -3,7 +3,7 @@ from fastapi import BackgroundTasks, FastAPI
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
 from starlette.responses import JSONResponse
-import smtplib, ssl
+from typing import Union
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import dotenv_values
@@ -15,7 +15,6 @@ class EmailContent(BaseModel):
     content: str
     type : str
 class User(BaseModel):
-    useAnotherAcc: int
     MAIL_USERNAME: str
     MAIL_PASSWORD: str
 # PASS = Abcd!3JKNDnn
@@ -34,9 +33,11 @@ app = FastAPI()
 
 
 @app.post("/email")
-async def send_email(user:User,email: EmailSchema, content: EmailContent):
-    if user.useAnotherAcc:
-        conf = ConnectionConfig(
+# async def send_email(email: EmailSchema, content: EmailContent,user:User | None = None): #python 3.10
+async def send_email(email: EmailSchema, content: EmailContent,user:Union[User, None] = None):
+    config=conf
+    if user:
+        config = ConnectionConfig(
         MAIL_USERNAME = user.MAIL_USERNAME,
         MAIL_PASSWORD = user.MAIL_PASSWORD,
         MAIL_FROM = credentials['MAIL_FROM'],
@@ -56,6 +57,6 @@ async def send_email(user:User,email: EmailSchema, content: EmailContent):
     body=html,
     subtype='html')
 
-    fm = FastMail(conf)
+    fm = FastMail(config)
     await fm.send_message(message)
     return {'status': 'ok'}
