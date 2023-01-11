@@ -14,6 +14,10 @@ class EmailContent(BaseModel):
     title: str
     content: str
     type : str
+class User(BaseModel):
+    useAnotherAcc: int
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
 # PASS = Abcd!3JKNDnn
 conf = ConnectionConfig(
     MAIL_USERNAME = credentials['MAIL_USERNAME'],
@@ -30,17 +34,27 @@ app = FastAPI()
 
 
 @app.post("/email")
-async def send_email(email: EmailSchema, content: EmailContent):
+async def send_email(user:User,email: EmailSchema, content: EmailContent):
+    if user.useAnotherAcc:
+        conf = ConnectionConfig(
+        MAIL_USERNAME = user.MAIL_USERNAME,
+        MAIL_PASSWORD = user.MAIL_PASSWORD,
+        MAIL_FROM = credentials['MAIL_FROM'],
+        MAIL_PORT = credentials['MAIL_PORT'],
+        MAIL_SERVER = credentials['MAIL_SERVER'],
+        MAIL_STARTTLS = credentials['MAIL_STARTTLS'],
+        MAIL_SSL_TLS = credentials['MAIL_SSL_TLS'],
+        USE_CREDENTIALS = credentials['USE_CREDENTIALS'],)
     html = f"""
     <p>{content.content}</p>
     """
     if content.type =='html':
         html=f'{content.content}'
-        message = MessageSchema(
-        subject=content.title,
-        recipients=email.dict().get("email"),
-        body=html,
-        subtype='html')
+    message = MessageSchema(
+    subject=content.title,
+    recipients=email.dict().get("email"),
+    body=html,
+    subtype='html')
 
     fm = FastMail(conf)
     await fm.send_message(message)
