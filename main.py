@@ -32,14 +32,8 @@ app = FastAPI()
 @app.post("/email")
 async def send_email(email: EmailSchema, content: EmailContent):
     html = f"""
-    <h1>Test Test</h1>
-    <h2>Tessst</h2>    
-    <br>
     <p>{content.content}</p>
-    <br>
-    <p>Best regard!</p> 
     """
-    
     if content.type =='html':
         html=f'{content.content}'
         message = MessageSchema(
